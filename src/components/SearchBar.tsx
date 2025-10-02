@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -6,6 +7,7 @@ interface SearchBarProps {
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ onSearch, isLoading = false }) => {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -26,7 +28,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, isLoading = false }) =>
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search for characters..."
+            placeholder={t('searchPlaceholder')}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
             disabled={isLoading}
           />
@@ -43,7 +45,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, isLoading = false }) =>
           onClick={handleSubmit}
           className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300 transition-colors cursor-pointer"
         >
-          Search
+          {t('searchButton')}
         </div>
       </div>
     </form>

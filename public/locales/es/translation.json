@@ -1,0 +1,19 @@
+{
+  "appTitle": "Personajes de Rick y Morty",
+  "appSubtitle": "Explora los personajes del multiverso",
+  "errorPrefix": "Error:",
+  "noCharactersFound": "No se encontraron personajes",
+  "footerTitle": "¡La Aventura te Espera!",
+  "footerSubtitle": "Descubre más personajes del infinito multiverso de Rick y Morty",
+  "footerCopyright": "© 2024 Explorador de Personajes de Rick y Morty",
+  "footerPoweredBy": "Potenciado por la API de Rick y Morty",
+  "headerAltText": "Personajes de Rick y Morty",
+  "footerAltText": "Una imagen promocional de Rick y Morty, mostrándolos escapando a través de un portal.",
+  "searchPlaceholder": "Buscar personajes...",
+  "searchButton": "Buscar",
+  "paginationPrevious": "Anterior",
+  "paginationNext": "Siguiente",
+  "characterGender": "Género:",
+  "characterOrigin": "Origen:",
+  "characterLocation": "Ubicación:"
+}

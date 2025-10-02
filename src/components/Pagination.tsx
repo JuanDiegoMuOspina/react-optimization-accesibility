@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface PaginationProps {
   currentPage: number;
@@ -15,6 +16,8 @@ const Pagination: React.FC<PaginationProps> = ({
   hasNext,
   hasPrev,
 }) => {
+  const { t } = useTranslation();
+
   const getVisiblePages = () => {
     const delta = 2;
     const range = [];
@@ -53,7 +56,7 @@ const Pagination: React.FC<PaginationProps> = ({
         onClick={() => hasPrev && onPageChange(currentPage - 1)}
         className={`px-3 py-2 rounded-md bg-white border border-gray-300 text-gray-500 hover:bg-gray-50 cursor-pointer ${!hasPrev ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
-        Previous
+        {t('paginationPrevious')}
       </div>
 
       {getVisiblePages().map((page, index) =>
@@ -80,7 +83,7 @@ const Pagination: React.FC<PaginationProps> = ({
         onClick={() => hasNext && onPageChange(currentPage + 1)}
         className={`px-3 py-2 rounded-md bg-white border border-gray-300 text-gray-500 hover:bg-gray-50 cursor-pointer ${!hasNext ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
-        Next
+        {t('paginationNext')}
       </div>
     </div>
   );

@@ -1,0 +1,19 @@
+{
+  "appTitle": "Rick and Morty Characters",
+  "appSubtitle": "Explore characters from the multiverse",
+  "errorPrefix": "Error:",
+  "noCharactersFound": "No characters found",
+  "footerTitle": "Adventure Awaits!",
+  "footerSubtitle": "Discover more characters from the infinite multiverse of Rick and Morty",
+  "footerCopyright": "© 2024 Rick and Morty Character Explorer",
+  "footerPoweredBy": "Powered by Rick and Morty API",
+  "headerAltText": "Rick and Morty characters",
+  "footerAltText": "A promotional image for Rick and Morty, showing them escaping through a portal.",
+  "searchPlaceholder": "Search for characters...",
+  "searchButton": "Search",
+  "paginationPrevious": "Previous",
+  "paginationNext": "Next",
+  "characterGender": "Gender:",
+  "characterOrigin": "Origin:",
+  "characterLocation": "Location:"
+}
