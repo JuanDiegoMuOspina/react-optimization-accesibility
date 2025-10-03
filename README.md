@@ -93,11 +93,14 @@ A continuación se muestra una comparación del rendimiento antes y después de 
 
 **Antes:**
 
-*Aquí va la imagen del antes*
+![Antes](antes1.png)
+![Antes](antes2.png)
+
+
 
 **Después:**
 
-*Aquí va la imagen del después*
+![Después](ahora.png)
 
 ## Soporte Multi-idioma
 
@@ -150,4 +153,4 @@ El objetivo principal de crear una prueba funcional para `rickAndMortyApi.ts` no
 - **Problema de Hoisting en Jest**: Se encontró un `ReferenceError` recurrente al intentar simular el módulo `axios`. Este error se debe a un problema de *hoisting* (elevación de variables) en la forma en que Jest ejecuta los `jest.mock` en un proyecto configurado con `"type": "module"` (ES Modules).
 - **Bloqueo Técnico**: A pesar de intentar múltiples patrones de configuración y simulación recomendados, este problema de fondo en la interacción entre Jest y la configuración del proyecto impidió que la prueba pudiera ejecutarse correctamente.
 
-**Conclusión:** El entorno de pruebas es ahora mucho más estable y la mayoría de las pruebas funcionan. Sin embargo, la prueba específica para `rickAndMortyApi.ts` sigue bloqueada y requeriría cambios más profundos en las herramientas de desarrollo (como añadir `babel-jest`) para ser solucionada.
+**Conclusión:** El entorno de pruebas es ahora mucho más estable y la mayoría de las pruebas funcionan. Sin embargo, la prueba específica para `rickAndMortyApi.ts` sigue bloqueada y requeriría cambios más profundos en las herramientas de desarrollo (como añadir `babel-jest`) para ser solucionada.-jest`) para ser solucionada.
