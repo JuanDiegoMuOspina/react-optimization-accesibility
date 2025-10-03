@@ -21,7 +21,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
       {/* Header with accessibility issues */}
-      <div className="relative bg-gradient-to-r from-green-400 to-blue-600 overflow-hidden">
+      <header className="relative bg-gradient-to-r from-green-400 to-blue-600 overflow-hidden">
         <div className="absolute inset-0">
           <img 
             src={headerImage} 
@@ -35,14 +35,14 @@ function App() {
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900/50"></div>
         </div>
         <div className="relative z-10 container mx-auto px-4 py-8 text-center">
-          <div className="text-4xl md:text-6xl font-bold text-white mb-2 drop-shadow-lg">
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-2 drop-shadow-lg">
             {t('appTitle')}
-          </div>
-          <div className="text-xl text-white/90 drop-shadow-md">
+          </h1>
+          <p className="text-xl text-white/90 drop-shadow-md">
             {t('appSubtitle')}
-          </div>
+          </p>
         </div>
-      </div>
+      </header>
 
       {/* Main content with poor structure */}
       <div className="flex-1">

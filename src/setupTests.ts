@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import './i18n';
 import '@testing-library/jest-dom';
 
 // Mock IntersectionObserver

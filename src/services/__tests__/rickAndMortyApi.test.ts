@@ -1,38 +1,64 @@
-// Mock axios to avoid import.meta issues in tests
-jest.mock('axios');
+import axios from 'axios';
+import { rickAndMortyApi } from '../rickAndMortyApi';
+import type { Character } from '../../types/api';
+
+// This is the variable that will hold our mock `get` function.
+// It's defined here so it can be accessed from both the mock factory and the tests.
+let mockGet: jest.Mock;
+
+jest.mock('axios', () => {
+  // Initialize the mock function inside the factory.
+  // This runs before any other module code.
+  mockGet = jest.fn();
+  return {
+    __esModule: true,
+    default: {
+      create: () => ({
+        get: mockGet, // Use the initialized mock function
+        interceptors: {
+          request: { use: jest.fn() },
+          response: { use: jest.fn() },
+        },
+      }),
+    },
+  };
+});
 
 describe('Rick and Morty API Service', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    // Clear mock history before each test
+    mockGet.mockClear();
   });
 
-  describe('API Configuration', () => {
-    it('should have correct base URL', () => {
-      const BASE_URL = 'https://rickandmortyapi.com/api';
-      expect(BASE_URL).toBe('https://rickandmortyapi.com/api');
-    });
-
-    it('should have correct timeout configuration', () => {
-      const timeout = 10000;
-      expect(timeout).toBe(10000);
-    });
-  });
-
-  describe('Error Handling', () => {
-    it('should handle network errors gracefully', () => {
-      const errorMessage = 'Network error';
-      const error = new Error(errorMessage);
-      
-      expect(error.message).toBe(errorMessage);
-    });
-
-    it('should fallback to mock API when needed', () => {
-      const mockResponse = {
-        info: { count: 8, pages: 1, next: null, prev: null },
-        results: []
+  describe('getCharacter', () => {
+    it('should fetch a single character successfully', async () => {
+      // Arrange
+      const characterId = 1;
+      const mockCharacter: Character = {
+        id: 1,
+        name: 'Rick Sanchez',
+        status: 'Alive',
+        species: 'Human',
+        type: '',
+        gender: 'Male',
+        origin: { name: 'Earth (C-137)', url: 'https://rickandmortyapi.com/api/location/1' },
+        location: { name: 'Citadel of Ricks', url: 'https://rickandmortyapi.com/api/location/3' },
+        image: 'https://rickandmortyapi.com/api/character/avatar/1.jpeg',
+        episode: ['https://rickandmortyapi.com/api/episode/1'],
+        url: 'https://rickandmortyapi.com/api/character/1',
+        created: '2017-11-04T18:48:46.250Z',
       };
       
-      expect(mockResponse.info.count).toBe(8);
+      // Setup the mock for this specific test
+      mockGet.mockResolvedValue({ data: mockCharacter });
+
+      // Act
+      const result = await rickAndMortyApi.getCharacter(characterId);
+
+      // Assert
+      expect(mockGet).toHaveBeenCalledTimes(1);
+      expect(mockGet).toHaveBeenCalledWith(`/character/${characterId}`);
+      expect(result).toEqual(mockCharacter);
     });
   });
 });
