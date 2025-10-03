@@ -165,5 +165,50 @@ describe('App Integration Tests', () => {
     await waitFor(() => {
       expect(screen.getByText('No characters found')).toBeInTheDocument();
     });
+  it('should allow searching and then paginating through results', async () => {
+    const user = userEvent.setup();
+
+    // Mock responses
+    const initialResponse = { info: { count: 0, pages: 0, next: null, prev: null }, results: [] };
+    const searchResponsePage1 = {
+      info: { count: 2, pages: 2, next: 'page2', prev: null },
+      results: [{ id: 1, name: 'Rick Sanchez', status: 'Alive' as const, species: 'Human', gender: 'Male' as const, origin: { name: 'Earth (C-137)', url: '' }, location: { name: 'Citadel of Ricks', url: '' }, image: '', episode: [], url: '', created: '' }],
+    };
+    const searchResponsePage2 = {
+      info: { count: 2, pages: 2, next: null, prev: 'page1' },
+      results: [{ id: 8, name: 'Adjudicator Rick', status: 'Dead' as const, species: 'Human', gender: 'Male' as const, origin: { name: 'unknown', url: '' }, location: { name: 'Citadel of Ricks', url: '' }, image: '', episode: [], url: '', created: '' }],
+    };
+
+    // Setup mock call sequence
+    mockedApi.getCharacters.mockResolvedValue(initialResponse);
+    mockedApi.searchCharacters
+      .mockResolvedValueOnce(searchResponsePage1) // First call for search
+      .mockResolvedValueOnce(searchResponsePage2); // Second call for pagination
+
+    render(<App />);
+
+    // 1. Perform search
+    const searchInput = screen.getByPlaceholderText('Search for characters...');
+    const searchButton = screen.getByText('Search');
+    await user.type(searchInput, 'Rick');
+    await user.click(searchButton);
+
+    // 2. Verify first page of search results
+    await waitFor(() => {
+      expect(screen.getByText('Rick Sanchez')).toBeInTheDocument();
+    });
+    expect(mockedApi.searchCharacters).toHaveBeenCalledWith('Rick', 1);
+
+    // 3. Paginate to the next page
+    const nextButton = screen.getByText('Next');
+    await user.click(nextButton);
+
+    // 4. Verify second page of search results
+    await waitFor(() => {
+      expect(screen.getByText('Adjudicator Rick')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Rick Sanchez')).not.toBeInTheDocument();
+    expect(mockedApi.searchCharacters).toHaveBeenCalledWith('Rick', 2);
+    expect(mockedApi.searchCharacters).toHaveBeenCalledTimes(2);
   });
 });

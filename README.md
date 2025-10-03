@@ -130,27 +130,102 @@ const MyComponent = () => {
 
 ## Pruebas Unitarias
 
-Se realizó un esfuerzo para implementar y reparar el conjunto de pruebas unitarias del proyecto utilizando Jest y React Testing Library.
+Se implementaron dos pruebas clave para asegurar la calidad y el correcto funcionamiento de la aplicación.
 
-### Objetivo
+### Prueba Unitaria para `rickAndMortyApi`
 
-El objetivo principal era añadir una prueba unitaria significativa para el servicio `rickAndMortyApi` en `src/services/rickAndMortyApi.ts`. La prueba debía verificar que, al llamar a una función del servicio (como `getCharacter`), se realizara una llamada HTTP correcta a través de `axios`, simulando una respuesta exitosa.
+**Objetivo:** Verificar que el servicio que consume la API de Rick and Morty construye y ejecuta las llamadas a bajo nivel (usando `axios`) de forma correcta.
 
-### Implementación y Resultados
+Esta prueba simula `axios` para aislar el servicio. Se asegura de que al llamar a `getCharacter(1)`, el servicio internamente intenta contactar el endpoint correcto (`/character/1`).
 
-Durante el proceso de implementación, se identificaron y solucionaron varios problemas críticos en el entorno de pruebas de Jest:
+```javascript
+// src/services/__tests__/rickAndMortyApi.test.ts
+it('should fetch a single character successfully', async () => {
+  // Arrange
+  const characterId = 1;
+  const mockCharacter: Character = {
+    id: 1,
+    name: 'Rick Sanchez',
+    status: 'Alive',
+    species: 'Human',
+    type: '',
+    gender: 'Male',
+    origin: { name: 'Earth (C-137)', url: 'https://rickandmortyapi.com/api/location/1' },
+    location: { name: 'Citadel of Ricks', url: 'https://rickandmortyapi.com/api/location/3' },
+    image: 'https://rickandmortyapi.com/api/character/avatar/1.jpeg',
+    episode: ['https://rickandmortyapi.com/api/episode/1'],
+    url: 'https://rickandmortyapi.com/api/character/1',
+    created: '2017-11-04T18:48:46.250Z',
+  };
+  
+  mockGet.mockResolvedValue({ data: mockCharacter });
 
-1.  **Inicialización de i18next**: Se corrigió la configuración de Jest para inicializar correctamente el sistema de traducciones (`i18next`) antes de ejecutar las pruebas. Esto solucionó la mayoría de los fallos en las pruebas de los componentes, que ahora pueden renderizar el texto correcto.
-2.  **Importación de JSON**: Se ajustó la configuración de `ts-jest` para permitir la importación de archivos `.json`, lo cual era necesario para las traducciones.
-3.  **Compatibilidad de Código Fuente**: Se modificó el código de `rickAndMortyApi.ts` para reemplazar el uso de `import.meta.env` (específico de Vite) por `process.env`, haciéndolo compatible con el entorno de Node.js de Jest.
+  // Act
+  const result = await rickAndMortyApi.getCharacter(characterId);
 
-Gracias a estos arreglos, la gran mayoría de las suites de pruebas del proyecto (incluyendo las de los componentes `CharacterCard`, `Pagination`, `SearchBar`, etc.) ahora **pasan exitosamente**.
+  // Assert
+  expect(mockGet).toHaveBeenCalledTimes(1);
+  expect(mockGet).toHaveBeenCalledWith(`/character/${characterId}`);
+  expect(result).toEqual(mockCharacter);
+});
+```
 
-### Dificultades y Estado Actual
+### Prueba de Integración para `App`
 
-El objetivo principal de crear una prueba funcional para `rickAndMortyApi.ts` no se pudo completar debido a un problema técnico complejo y persistente.
+**Objetivo:** Simular un flujo de usuario completo para garantizar que múltiples componentes (`SearchBar`, `CharacterList`, `Pagination`) interactúan correctamente.
 
-- **Problema de Hoisting en Jest**: Se encontró un `ReferenceError` recurrente al intentar simular el módulo `axios`. Este error se debe a un problema de *hoisting* (elevación de variables) en la forma en que Jest ejecuta los `jest.mock` en un proyecto configurado con `"type": "module"` (ES Modules).
-- **Bloqueo Técnico**: A pesar de intentar múltiples patrones de configuración y simulación recomendados, este problema de fondo en la interacción entre Jest y la configuración del proyecto impidió que la prueba pudiera ejecutarse correctamente.
+Esta prueba verifica el siguiente escenario:
+1.  Un usuario realiza una búsqueda.
+2.  Los resultados correctos aparecen en pantalla.
+3.  El usuario navega a la siguiente página de resultados.
+4.  La lista se actualiza para mostrar los nuevos resultados.
 
-**Conclusión:** El entorno de pruebas es ahora mucho más estable y la mayoría de las pruebas funcionan. Sin embargo, la prueba específica para `rickAndMortyApi.ts` sigue bloqueada y requeriría cambios más profundos en las herramientas de desarrollo (como añadir `babel-jest`) para ser solucionada.-jest`) para ser solucionada.
+```javascript
+// src/__tests__/App.test.tsx
+it('should allow searching and then paginating through results', async () => {
+  const user = userEvent.setup();
+
+  // Mock responses
+  const initialResponse = { info: { count: 0, pages: 0, next: null, prev: null }, results: [] };
+  const searchResponsePage1 = {
+    info: { count: 2, pages: 2, next: 'page2', prev: null },
+    results: [{ id: 1, name: 'Rick Sanchez', status: 'Alive' as const, species: 'Human', gender: 'Male' as const, origin: { name: 'Earth (C-137)', url: '' }, location: { name: 'Citadel of Ricks', url: '' }, image: '', episode: [], url: '', created: '' }],
+  };
+  const searchResponsePage2 = {
+    info: { count: 2, pages: 2, next: null, prev: 'page1' },
+    results: [{ id: 8, name: 'Adjudicator Rick', status: 'Dead' as const, species: 'Human', gender: 'Male' as const, origin: { name: 'unknown', url: '' }, location: { name: 'Citadel of Ricks', url: '' }, image: '', episode: [], url: '', created: '' }],
+  };
+
+  // Setup mock call sequence
+  mockedApi.getCharacters.mockResolvedValue(initialResponse);
+  mockedApi.searchCharacters
+    .mockResolvedValueOnce(searchResponsePage1) // First call for search
+    .mockResolvedValueOnce(searchResponsePage2); // Second call for pagination
+
+  render(<App />);
+
+  // 1. Perform search
+  const searchInput = screen.getByPlaceholderText('Search for characters...');
+  const searchButton = screen.getByText('Search');
+  await user.type(searchInput, 'Rick');
+  await user.click(searchButton);
+
+  // 2. Verify first page of search results
+  await waitFor(() => {
+    expect(screen.getByText('Rick Sanchez')).toBeInTheDocument();
+  });
+  expect(mockedApi.searchCharacters).toHaveBeenCalledWith('Rick', 1);
+
+  // 3. Paginate to the next page
+  const nextButton = screen.getByText('Next');
+  await user.click(nextButton);
+
+  // 4. Verify second page of search results
+  await waitFor(() => {
+    expect(screen.getByText('Adjudicator Rick')).toBeInTheDocument();
+  });
+  expect(screen.queryByText('Rick Sanchez')).not.toBeInTheDocument();
+  expect(mockedApi.searchCharacters).toHaveBeenCalledWith('Rick', 2);
+  expect(mockedApi.searchCharacters).toHaveBeenCalledTimes(2);
+});
+```-jest`) para ser solucionada.
